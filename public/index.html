@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#071a2b">
+    <meta name="description" content="Live standings and player stats for The Pool Room's 2026–27 NHL hockey pool.">
+    <meta property="og:title" content="The Pool Room — Live NHL standings">
+    <meta property="og:description" content="Ten poolies. 160 skaters. One season of bragging rights.">
+    <meta property="og:type" content="website">
+    <title>The Pool Room · Live NHL standings</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://assets.nhle.com">
+    <link rel="stylesheet" href="styles.css">
+    <script type="module" src="app.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to standings</a>
+
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="The Pool Room home">
+        <span class="brand-puck" aria-hidden="true"></span>
+        <span><strong>The Pool</strong> Room</span>
+      </a>
+      <nav aria-label="Primary navigation">
+        <a href="#leaderboard">Standings</a>
+        <a href="#draft">Draft board</a>
+      </nav>
+      <div class="live-pill" id="freshness-pill">
+        <span aria-hidden="true"></span>
+        <span id="freshness-label">Loading stats</span>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="hero" id="top" aria-labelledby="hero-title">
+        <div class="rink-lines" aria-hidden="true">
+          <span class="centre-line"></span>
+          <span class="centre-circle"></span>
+        </div>
+        <div class="hero-copy">
+          <p class="eyebrow"><span>2026–27 season</span> · Live pool tracker</p>
+          <h1 id="hero-title">Every pick.<br><em>Every point.</em></h1>
+          <p class="hero-deck">Ten poolies, 160 skaters, and one long season of bragging rights. Official NHL stats, refreshed automatically.</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#leaderboard">View standings <span aria-hidden="true">↓</span></a>
+            <span class="scoring-note">1 goal = 1 point · 1 assist = 1 point</span>
+          </div>
+        </div>
+        <aside class="scoreboard" aria-label="Current pool leader">
+          <div class="scoreboard-top">
+            <span>Pool leader</span>
+            <span id="scoreboard-season">26 / 27</span>
+          </div>
+          <div class="scoreboard-body">
+            <div>
+              <span class="scoreboard-label">1st</span>
+              <strong id="hero-leader">—</strong>
+            </div>
+            <div class="scoreboard-score">
+              <span>PTS</span>
+              <strong id="hero-points">—</strong>
+            </div>
+          </div>
+          <div class="scoreboard-ticker">
+            <span>Top skater</span>
+            <strong id="hero-player">Waiting for the opening faceoff…</strong>
+          </div>
+        </aside>
+      </section>
+
+      <section class="section standings-section" id="leaderboard" aria-labelledby="standings-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">The race</p>
+            <h2 id="standings-title">League standings</h2>
+          </div>
+          <p class="section-note" id="updated-at" role="status" aria-live="polite">Loading the latest numbers…</p>
+        </div>
+
+        <div class="podium" id="podium" aria-label="Top three poolies">
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+        </div>
+
+        <div class="table-shell">
+          <table>
+            <caption class="sr-only">Current hockey pool standings</caption>
+            <thead>
+              <tr>
+                <th scope="col">Rank</th>
+                <th scope="col">Poolie</th>
+                <th scope="col" title="Drafted skaters with NHL games played">Active</th>
+                <th scope="col">Goals</th>
+                <th scope="col">Assists</th>
+                <th scope="col">Points</th>
+              </tr>
+            </thead>
+            <tbody id="standings-body">
+              <tr><td colspan="6" class="loading-cell">Sharpening the numbers…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="stat-strip" aria-label="Pool summary">
+        <div><strong id="summary-poolies">10</strong><span>Poolies</span></div>
+        <div><strong id="summary-picks">160</strong><span>Draft picks</span></div>
+        <div><strong id="summary-points">—</strong><span>Total points</span></div>
+        <div><strong id="summary-active">—</strong><span>Scoring skaters</span></div>
+      </section>
+
+      <section class="section draft-section" id="draft" aria-labelledby="draft-title">
+        <div class="section-heading draft-heading">
+          <div>
+            <p class="eyebrow">Who picked whom?</p>
+            <h2 id="draft-title">The draft board</h2>
+          </div>
+          <label class="search-control">
+            <span class="sr-only">Search by player or poolie</span>
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m21 21-4.3-4.3m2.3-5.2a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z"/></svg>
+            <input id="player-search" type="search" placeholder="Search player or poolie…" autocomplete="off">
+          </label>
+        </div>
+
+        <div class="filter-row" id="poolie-filters" aria-label="Filter draft by poolie"></div>
+        <div class="draft-grid" id="draft-grid" aria-live="polite">
+          <p class="loading-cell">Loading all 160 picks…</p>
+        </div>
+        <p class="empty-state" id="empty-state" hidden>No players found. Try a different search.</p>
+      </section>
+
+      <section class="method-section" aria-labelledby="method-title">
+        <div>
+          <p class="eyebrow">How it works</p>
+          <h2 id="method-title">No spreadsheets at game time.</h2>
+        </div>
+        <p>Stats are pulled from the NHL public web API and this site is rebuilt every three hours. Totals include regular-season goals and assists. Prospects stay on the board until their first NHL game.</p>
+      </section>
+    </main>
+
+    <footer>
+      <a class="brand footer-brand" href="#top"><span class="brand-puck" aria-hidden="true"></span><span><strong>The Pool</strong> Room</span></a>
+      <p>Built for the group chat. Powered by official NHL data.</p>
+      <p class="fine-print">Unofficial fan project · Not affiliated with the NHL</p>
+    </footer>
+
+    <noscript>
+      <p class="noscript">JavaScript is required to load the live pool standings.</p>
+    </noscript>
+  </body>
+</html>

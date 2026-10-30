@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "leagueName": "The Pool Room",
+  "season": "2026–27",
+  "source": "HockeyDraft2627.xlsx",
+  "poolies": [
+    {
+      "name": "Tuckey",
+      "picks": [
+        "Connor McDavid", "Matthew Tkachuk", "Mikko Rantanen", "Elias Pettersson",
+        "Jake Sanderson", "Adam Fox", "Mikhail Sergachev", "Roman Josi",
+        "Kailer Yamamoto", "Erik Karlsson", "Owen Power", "Seth Jones",
+        "Devon Toews", "Fraser Minten", "Jack Roslovic", "Jake DeBrusk"
+      ]
+    },
+    {
+      "name": "Marty",
+      "picks": [
+        "Nikita Kucherov", "William Nylander", "Jack Hughes", "Sam Reinhart",
+        "Mark Stone", "Beckett Sennecke", "Andrei Svechnikov", "Barkov",
+        "Brayden Point", "Dylan Holloway", "Joel Eriksson Ek", "Evgeni Malkin",
+        "Mikael Granlund", "Patrick Kane", "Shea Theodore", "Pierre-Luc Dubois"
+      ]
+    },
+    {
+      "name": "Chapman",
+      "picks": [
+        "Leon Draisaitl", "Nick Suzuki", "Cale Makar", "Sidney Crosby",
+        "Jesper Bratt", "JJ Peterka", "Brady Tkachuk", "Jackson Blake",
+        "Charlie McAvoy", "Jackson LaCombe", "Ivan Barbashev", "Easton Cowan",
+        "Tomáš Hertl", "Josh Doan", "Anthony Cirelli", "Porter Martone"
+      ]
+    },
+    {
+      "name": "Brian",
+      "picks": [
+        "Nathan MacKinnon", "Sebastian Aho", "Clayton Keller", "Connor Bedard",
+        "Alexis Lafrenière", "Filip Forsberg", "Drake Batherson", "Jack Quinn",
+        "Roope Hintz", "Cole Perfetti", "Jimmy Snuggerud", "Mason McTavish",
+        "Brock Boeser", "Gavin Mackenna", "Jordan Kyrou", "Joel Farabee"
+      ]
+    },
+    {
+      "name": "Gord",
+      "picks": [
+        "Macklin Celebrini", "Mark Scheifele", "Cole Caufield", "Artemi Panarin",
+        "Tage Thompson", "Mika Zibanejad", "Ryan O'Reilly", "Adrian Kempe",
+        "John Tavares", "Gabriel Vilardi", "Travis Konecny", "Brock Nelson",
+        "Bryan Rust", "Anthony Mantha", "Alex Ovechkin", "Charlie Coyle"
+      ]
+    },
+    {
+      "name": "Darrin",
+      "picks": [
+        "Kirill Kaprizov", "Tim Stützle", "Quinn Hughes", "Leo Carlsson",
+        "Dylan Guenther", "Cutter Gauthier", "Logan Cooley", "Will Smith",
+        "Ivan Demidov", "Zach Benson", "Dylan Strome", "Matthew Knies",
+        "Jordan Eberle", "Rickard Rakell", "Marco Rossi", "Arseny Gritsyuk"
+      ]
+    },
+    {
+      "name": "Steve H",
+      "picks": [
+        "David Pastrňák", "Matt Boldy", "Jake Guentzel", "Lane Hutson",
+        "Lucas Raymond", "Bo Horvat", "Darren Raddysh", "Juraj Slafkovsky",
+        "Morgan Geekie", "Ivar Stenberg", "Moritz Seider", "Pavel Zacha",
+        "Elias Lindholm", "Tyler Toffoli", "Luke Evangelista", "Alexander Wennberg"
+      ]
+    },
+    {
+      "name": "Muir",
+      "picks": [
+        "Martin Nečas", "Auston Matthews", "Mitch Marner", "Brandon Hagel",
+        "Robert Thomas", "Mathew Barzal", "Nico Hischier", "Nikolaj Ehlers",
+        "Dylan Larkin", "J.T. Miller", "Zach Hyman", "Adam Fantilli",
+        "Ryan Nugent-Hopkins", "Dylan Cozens", "Shayne Gostisbehere", "Nazem Kadri"
+      ]
+    },
+    {
+      "name": "Dan",
+      "picks": [
+        "Jason Robertson", "Kyle Connor", "Zach Werenski", "Wyatt Johnston",
+        "Rasmus Dahlin", "Matthew Schaefer", "Nick Schmaltz", "Jakob Chychrun",
+        "Miro Heiskanen", "Seth Jarvis", "Vasily Podkolzin", "Tom Wilson",
+        "Vincent Trocheck", "Sam Bennett", "Timo Meier", "Cole Hutson"
+      ]
+    },
+    {
+      "name": "Sanjeet",
+      "picks": [
+        "Jack Eichel", "Evan Bouchard", "Alex DeBrincat", "Artturi Lehkonen",
+        "Kirill Marchenko", "Steven Stamkos", "Logan Stankoven", "Matvei Michkov",
+        "Trevor Zegras", "Pavel Dorofeyev", "Alex Tuch", "Kaapo Kakko",
+        "Carter Verhaeghe", "Viktor Arvidsson", "John Carlson", "Tyler Bertuzzi"
+      ]
+    }
+  ]
+}

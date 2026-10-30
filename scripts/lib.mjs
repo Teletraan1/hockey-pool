@@ -1,0 +1,106 @@
+export const PLAYER_ALIASES = Object.freeze({
+  Barkov: "Aleksander Barkov",
+  "David Pastrňák": "David Pastrnak",
+  "Gavin Mackenna": "Gavin McKenna",
+  "Martin Nečas": "Martin Necas",
+  "Ryan Nugent-Hopkins": "Ryan Nugent Hopkins"
+});
+
+export function normalizeName(value) {
+  return String(value ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9]+/g, " ")
+    .trim()
+    .toLowerCase();
+}
+
+export function queryForPlayer(draftName) {
+  return PLAYER_ALIASES[draftName] ?? draftName;
+}
+
+export function selectSearchMatch(draftName, results) {
+  const target = normalizeName(queryForPlayer(draftName));
+  return results.find((candidate) => normalizeName(candidate.name) === target) ?? null;
+}
+
+export function currentSeasonId(date = new Date()) {
+  const year = date.getUTCFullYear();
+  const startsThisYear = date.getUTCMonth() >= 6;
+  const start = startsThisYear ? year : year - 1;
+  return Number(`${start}${start + 1}`);
+}
+
+export function seasonLabel(seasonId) {
+  const value = String(seasonId);
+  return `${value.slice(0, 4)}–${value.slice(6)}`;
+}
+
+export function sumNhlSeason(landing, seasonId) {
+  const featured = landing.featuredStats;
+  if (
+    Number(featured?.season) === Number(seasonId) &&
+    featured?.regularSeason?.subSeason
+  ) {
+    const row = featured.regularSeason.subSeason;
+    return {
+      gamesPlayed: Number(row.gamesPlayed ?? 0),
+      goals: Number(row.goals ?? 0),
+      assists: Number(row.assists ?? 0),
+      points: Number(row.points ?? 0),
+      plusMinus: Number(row.plusMinus ?? 0),
+      pim: Number(row.pim ?? 0),
+      powerPlayPoints: Number(row.powerPlayPoints ?? 0)
+    };
+  }
+
+  const rows = (landing.seasonTotals ?? []).filter(
+    (row) =>
+      Number(row.season) === Number(seasonId) &&
+      Number(row.gameTypeId) === 2 &&
+      row.leagueAbbrev === "NHL"
+  );
+
+  return rows.reduce(
+    (total, row) => ({
+      gamesPlayed: total.gamesPlayed + Number(row.gamesPlayed ?? 0),
+      goals: total.goals + Number(row.goals ?? 0),
+      assists: total.assists + Number(row.assists ?? 0),
+      points: total.points + Number(row.points ?? 0),
+      plusMinus: total.plusMinus + Number(row.plusMinus ?? 0),
+      pim: total.pim + Number(row.pim ?? 0),
+      powerPlayPoints:
+        total.powerPlayPoints + Number(row.powerPlayPoints ?? 0)
+    }),
+    {
+      gamesPlayed: 0,
+      goals: 0,
+      assists: 0,
+      points: 0,
+      plusMinus: 0,
+      pim: 0,
+      powerPlayPoints: 0
+    }
+  );
+}
+
+export function rankPoolies(poolies) {
+  const sorted = [...poolies].sort(
+    (a, b) =>
+      b.points - a.points ||
+      b.goals - a.goals ||
+      b.assists - a.assists ||
+      a.name.localeCompare(b.name)
+  );
+
+  let lastScore = null;
+  let lastRank = 0;
+  return sorted.map((poolie, index) => {
+    const score = `${poolie.points}:${poolie.goals}:${poolie.assists}`;
+    if (score !== lastScore) {
+      lastRank = index + 1;
+      lastScore = score;
+    }
+    return { ...poolie, rank: lastRank };
+  });
+}

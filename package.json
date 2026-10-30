@@ -1,0 +1,16 @@
+{
+  "name": "hockey-pool-live",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A live, automatically updated NHL hockey pool dashboard.",
+  "type": "module",
+  "scripts": {
+    "start": "node scripts/serve.mjs",
+    "update": "node scripts/update-stats.mjs",
+    "check": "node scripts/validate.mjs",
+    "test": "node test/lib.test.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
