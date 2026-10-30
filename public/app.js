@@ -1,3 +1,5 @@
+import { differenceFromLeader } from "./chart.js";
+
 const state = {
   data: null,
   history: null,
@@ -138,17 +140,9 @@ function renderPointsChart() {
   }
 
   const { dates, series: cumulativeSeries } = state.history;
-  const leaderName = state.data.leaderboard[0]?.name;
-  const leaderSeries = cumulativeSeries.find((item) => item.name === leaderName);
-  const isRelative = state.chartMode === "leader" && leaderSeries;
+  const isRelative = state.chartMode === "leader";
   const series = isRelative
-    ? cumulativeSeries.map((item) => ({
-        ...item,
-        points: item.points.map((point, index) => ({
-          ...point,
-          value: point.value - (leaderSeries.points[index]?.value ?? 0)
-        }))
-      }))
+    ? differenceFromLeader(cumulativeSeries)
     : cumulativeSeries;
   const width = 1000;
   const height = 430;
@@ -261,21 +255,21 @@ function renderPointsChart() {
   document.querySelector("#chart-range").textContent = `${startLabel} – ${endLabel}`;
   const leader = ordered[0];
   document.querySelector("#chart-title").textContent = isRelative
-    ? "Difference from leader"
+    ? "Points behind leader"
     : "Points accumulated";
   document.querySelector("#chart-description").textContent = isRelative
-    ? `${leaderName} is the zero baseline. Every other line shows its points difference against the current leader.`
+    ? "The highest score on each date is the zero baseline. Every other line shows how many points it trailed that day."
     : "Follow the race from opening night to today. Select a poolie to show or hide their line.";
   document.querySelector("#chart-key-label").textContent = isRelative
-    ? `${leaderName} baseline`
+    ? "Daily leader baseline"
     : "Cumulative pool points";
   document.querySelector("#chart-measure").textContent = isRelative
-    ? `Difference vs ${leaderName}`
+    ? "Difference from daily leader"
     : "Goals + assists";
   elements.chart.setAttribute(
     "aria-label",
     isRelative
-      ? `Pool points difference from current leader ${leaderName}, from ${startLabel} to ${endLabel}. ${leaderName} is the zero baseline.`
+      ? `Points behind the daily pool leader from ${startLabel} to ${endLabel}. Each date's highest score is the zero baseline.`
       : `Cumulative pool points from ${startLabel} to ${endLabel}. ${leader.name} leads with ${leader.latest} points.`
   );
 

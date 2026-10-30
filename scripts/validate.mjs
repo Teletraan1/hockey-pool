@@ -6,6 +6,7 @@ const required = [
   "public/favicon.svg",
   "public/styles.css",
   "public/app.js",
+  "public/chart.js",
   "public/data/draft.json",
   "public/data/history.json",
   "public/data/stats.json"

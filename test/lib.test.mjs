@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { differenceFromLeader } from "../public/chart.js";
 import {
   buildPointsHistory,
   currentSeasonId,
@@ -115,5 +116,35 @@ test("builds cumulative points history by poolie and date", () => {
   assert.deepEqual(
     history.series[1].points.map((point) => point.value),
     [0, 0, 4, 4, 4]
+  );
+});
+
+test("plots every poolie at or below the leader on each date", () => {
+  const result = differenceFromLeader([
+    {
+      name: "A",
+      points: [
+        { date: "2026-10-01", value: 4 },
+        { date: "2026-10-02", value: 10 }
+      ]
+    },
+    {
+      name: "B",
+      points: [
+        { date: "2026-10-01", value: 6 },
+        { date: "2026-10-02", value: 8 }
+      ]
+    }
+  ]);
+
+  assert.deepEqual(
+    result.map((item) => item.points.map((point) => point.value)),
+    [[-2, 0], [0, -2]]
+  );
+  assert.deepEqual(
+    [0, 1].map((index) =>
+      Math.max(...result.map((item) => item.points[index].value))
+    ),
+    [0, 0]
   );
 });
