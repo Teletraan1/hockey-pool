@@ -36,6 +36,40 @@ export function selectSearchMatch(draftName, results) {
   return results.find((candidate) => normalizeName(candidate.name) === target) ?? null;
 }
 
+export function parseEspnInjuries(payload) {
+  return (payload?.injuries ?? []).flatMap((team) =>
+    (team.injuries ?? []).flatMap((injury) => {
+      const playerName = injury.athlete?.displayName;
+      if (!playerName) return [];
+
+      return [{
+        playerName,
+        normalizedName: normalizeName(playerName),
+        team: injury.athlete?.team?.abbreviation ?? null,
+        status: injury.status ?? injury.type?.description ?? "Injured",
+        type: injury.details?.type ?? null,
+        returnDate: injury.details?.returnDate ?? null,
+        detail: injury.shortComment ?? null,
+        updatedAt: injury.date ?? null,
+        source: "ESPN"
+      }];
+    })
+  );
+}
+
+export function injuryForPlayer(player, injuries) {
+  const target = normalizeName(
+    player.officialName || queryForPlayer(player.draftName)
+  );
+  const matches = injuries.filter(
+    (injury) => injury.normalizedName === target
+  );
+  if (matches.length === 0) return null;
+
+  return matches.find((injury) => injury.team === player.team) ??
+    (matches.length === 1 ? matches[0] : null);
+}
+
 export function currentSeasonId(date = new Date()) {
   const year = date.getUTCFullYear();
   const startsThisYear = date.getUTCMonth() >= 6;

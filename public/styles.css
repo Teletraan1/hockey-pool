@@ -354,8 +354,9 @@ tbody tr:hover { background: var(--ice); }
 .filter-button:hover, .filter-button[aria-pressed="true"] { color: var(--white); border-color: var(--navy); background: var(--navy); }
 
 .draft-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 1rem; }
-.roster-card { border: 1px solid var(--line); border-radius: .65rem; overflow: hidden; background: var(--white); box-shadow: 0 12px 35px rgba(7,26,43,.055); }
-.roster-header { display: flex; align-items: baseline; justify-content: space-between; padding: 1rem 1.1rem; color: var(--white); background: var(--navy); }
+.roster-card { position: relative; border: 1px solid var(--line); border-radius: .65rem; background: var(--white); box-shadow: 0 12px 35px rgba(7,26,43,.055); }
+.roster-card:hover, .roster-card:focus-within { z-index: 20; }
+.roster-header { display: flex; align-items: baseline; justify-content: space-between; padding: 1rem 1.1rem; border-radius: .6rem .6rem 0 0; color: var(--white); background: var(--navy); }
 .roster-header h3 { margin: 0; font-family: var(--display); font-size: 1.55rem; text-transform: uppercase; }
 .roster-header span { color: var(--blue-soft); font-size: .65rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
 .player-list { margin: 0; padding: 0; list-style: none; }
@@ -365,7 +366,20 @@ tbody tr:hover { background: var(--ice); }
 .player-avatar img { width: 100%; height: 100%; object-fit: contain; object-position: bottom; }
 .player-avatar .fallback { display: grid; place-items: center; width: 2.2rem; height: 2.2rem; margin-top: .45rem; border-radius: 50%; color: var(--muted); background: var(--ice); font-size: .62rem; font-weight: 800; }
 .player-info { min-width: 0; padding-left: .35rem; }
-.player-info strong { display: block; overflow: hidden; font-size: .76rem; text-overflow: ellipsis; white-space: nowrap; }
+.player-name { display: flex; align-items: center; gap: .28rem; min-width: 0; }
+.player-name > strong { display: block; min-width: 0; overflow: hidden; font-size: .76rem; text-overflow: ellipsis; white-space: nowrap; }
+.injury-badge { position: relative; display: inline-flex; flex: none; border-radius: .2rem; cursor: help; font-size: .9rem; line-height: 1; outline: none; }
+.injury-badge:focus-visible { box-shadow: 0 0 0 3px rgba(45,158,199,.28); }
+.injury-tooltip { position: absolute; z-index: 30; bottom: calc(100% + .65rem); left: 50%; width: min(16rem, calc(100vw - 2rem)); padding: .8rem; border: 1px solid rgba(255,255,255,.12); border-radius: .45rem; visibility: hidden; color: var(--white); background: rgba(7,26,43,.98); box-shadow: 0 14px 35px rgba(7,26,43,.3); font-family: var(--body); font-size: .66rem; font-weight: 500; line-height: 1.4; opacity: 0; pointer-events: none; transform: translate(-50%, .25rem); transition: opacity .15s, transform .15s, visibility .15s; }
+.injury-tooltip::after { position: absolute; top: 100%; left: 50%; width: .55rem; height: .55rem; background: rgba(7,26,43,.98); content: ""; transform: translate(-50%, -50%) rotate(45deg); }
+.injury-badge:hover .injury-tooltip, .injury-badge:focus .injury-tooltip { visibility: visible; opacity: 1; transform: translate(-50%, 0); }
+.injury-tooltip-title { display: block; margin-bottom: .45rem; color: var(--blue-soft); font-size: .68rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.injury-tooltip dl { display: grid; gap: .2rem; margin: 0; }
+.injury-tooltip dl div { display: grid; grid-template-columns: 5.3rem minmax(0, 1fr); gap: .4rem; }
+.injury-tooltip dt { color: rgba(255,255,255,.58); }
+.injury-tooltip dd { margin: 0; font-weight: 700; }
+.injury-tooltip p { margin: .55rem 0 0; padding-top: .5rem; border-top: 1px solid rgba(255,255,255,.12); color: rgba(255,255,255,.78); }
+.injury-tooltip small { display: block; margin-top: .5rem; color: rgba(255,255,255,.42); font-size: .56rem; text-transform: uppercase; }
 .player-meta { display: flex; gap: .4rem; color: var(--muted); font-size: .6rem; font-weight: 600; text-transform: uppercase; }
 .player-meta .awaiting { color: #a06d00; }
 .player-score { min-width: 2.7rem; text-align: right; }

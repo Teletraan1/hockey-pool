@@ -4,6 +4,8 @@ import { fileURLToPath } from "node:url";
 import {
   buildPointsHistory,
   currentSeasonId,
+  injuryForPlayer,
+  parseEspnInjuries,
   playerIdFor,
   queryForPlayer,
   rankPoolies,
@@ -164,11 +166,32 @@ async function mapConcurrent(items, limit, mapper) {
 }
 
 console.log(`Refreshing ${picks.length} picks for ${seasonLabel(seasonId)}…`);
-const players = await mapConcurrent(picks, concurrency, loadPick);
+const refreshedPlayers = await mapConcurrent(picks, concurrency, loadPick);
 
 if (successfulLandings === 0 && previous.players.length > 0) {
   throw new Error("The NHL API returned no player records; keeping the last deployment.");
 }
+
+let injuryFeedAvailable = false;
+let injuryFeedUpdatedAt = null;
+let injuries = [];
+try {
+  const payload = await fetchJson(
+    "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/injuries"
+  );
+  injuries = parseEspnInjuries(payload);
+  injuryFeedAvailable = true;
+  injuryFeedUpdatedAt = payload.timestamp ?? null;
+  console.log(`Loaded ${injuries.length} active injuries from ESPN.`);
+} catch (error) {
+  console.warn(`Could not refresh ESPN injuries: ${error.message}`);
+}
+
+const players = refreshedPlayers.map((player) => {
+  const { injury: _previousInjury, ...withoutInjury } = player;
+  const injury = injuryForPlayer(withoutInjury, injuries);
+  return injury ? { ...withoutInjury, injury } : withoutInjury;
+});
 
 const poolies = draft.poolies.map((poolie) => {
   const roster = players.filter((player) => player.poolie === poolie.name);
@@ -235,12 +258,20 @@ const output = {
   seasonLabel: seasonLabel(seasonId),
   generatedAt: generatedAt.toISOString(),
   scoring: "1 point per goal or assist",
-  source: "NHL public web API",
+  source: injuryFeedAvailable
+    ? "NHL public web API · injuries from ESPN"
+    : "NHL public web API",
+  injuryFeed: {
+    available: injuryFeedAvailable,
+    source: "ESPN",
+    updatedAt: injuryFeedUpdatedAt
+  },
   summary: {
     poolies: draft.poolies.length,
     picks: players.length,
     resolvedPlayers,
-    playersWithStats: players.filter((player) => player.stats.gamesPlayed > 0).length
+    playersWithStats: players.filter((player) => player.stats.gamesPlayed > 0).length,
+    injuredPlayers: players.filter((player) => player.injury).length
   },
   leaderboard,
   players

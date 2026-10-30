@@ -71,6 +71,10 @@ assert(
   app.includes("chart.js?v=__ASSET_VERSION__"),
   "app.js must version its chart module."
 );
+assert(
+  app.includes('class="injury-tooltip"'),
+  "Injury badges must expose detailed tooltips."
+);
 assert(html.includes('id="leaderboard"'), "The page needs a leaderboard landmark.");
 assert(html.includes('id="draft"'), "The page needs a draft-board landmark.");
 assert(html.includes('id="points-chart"'), "The page needs a points chart landmark.");

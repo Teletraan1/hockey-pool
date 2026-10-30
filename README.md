@@ -53,7 +53,7 @@ Name differences in NHL data belong in `PLAYER_ALIASES` in `scripts/lib.mjs`. Th
 
 ## Data and scoring
 
-Statistics come from the public NHL web API. `scripts/update-stats.mjs` searches for each player, retrieves current-season totals and game logs, and writes normalized standings and history snapshots. The chart is rebuilt from every skater's game log and checked against the leaderboard before deployment. The dashboard uses regular-season goals plus assists. This project is unofficial and is not affiliated with the NHL.
+Statistics come from the public NHL web API. Injury statuses come from ESPN's public site API and appear as a bandage beside affected players. `scripts/update-stats.mjs` searches for each player, retrieves current-season totals, game logs, and current injuries, then writes normalized standings and history snapshots. The chart is rebuilt from every skater's game log and checked against the leaderboard before deployment. The dashboard uses regular-season goals plus assists. This project is unofficial and is not affiliated with the NHL or ESPN.
 
 ## Project structure
 

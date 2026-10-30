@@ -7,7 +7,9 @@ import {
 import {
   buildPointsHistory,
   currentSeasonId,
+  injuryForPlayer,
   normalizeName,
+  parseEspnInjuries,
   playerIdFor,
   rankPoolies,
   selectSearchMatch,
@@ -32,6 +34,49 @@ test("pins ambiguous player names to the intended NHL IDs", () => {
   assert.equal(playerIdFor("Jack Hughes"), 8481559);
   assert.equal(playerIdFor("Mathew Barzal"), 8478445);
   assert.equal(playerIdFor("Connor McDavid"), null);
+});
+
+test("parses ESPN injuries and matches players by normalized name and team", () => {
+  const injuries = parseEspnInjuries({
+    injuries: [{
+      injuries: [{
+        status: "Injured Reserve",
+        shortComment: "Nugent-Hopkins (upper body) is on injured reserve.",
+        date: "2026-10-29T12:00Z",
+        athlete: {
+          displayName: "Ryan Nugent-Hopkins",
+          team: { abbreviation: "EDM" }
+        },
+        details: { type: "Upper Body", returnDate: "2026-11-05" }
+      }]
+    }]
+  });
+
+  assert.deepEqual(injuries[0], {
+    playerName: "Ryan Nugent-Hopkins",
+    normalizedName: "ryan nugent hopkins",
+    team: "EDM",
+    status: "Injured Reserve",
+    type: "Upper Body",
+    returnDate: "2026-11-05",
+    detail: "Nugent-Hopkins (upper body) is on injured reserve.",
+    updatedAt: "2026-10-29T12:00Z",
+    source: "ESPN"
+  });
+  assert.equal(
+    injuryForPlayer(
+      { officialName: "Ryan Nugent Hopkins", team: "EDM" },
+      injuries
+    ),
+    injuries[0]
+  );
+  assert.equal(
+    injuryForPlayer(
+      { officialName: "Ryan Nugent Hopkins", team: "CGY" },
+      [...injuries, { ...injuries[0], team: "VAN" }]
+    ),
+    null
+  );
 });
 
 test("selects the NHL season around July", () => {

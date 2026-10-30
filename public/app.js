@@ -75,6 +75,14 @@ function formatDate(value) {
   }).format(new Date(value));
 }
 
+function formatCalendarDate(value) {
+  if (!value) return "Not provided";
+  const date = String(value).slice(0, 10);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return String(value);
+  return new Intl.DateTimeFormat(undefined, { dateStyle: "medium" })
+    .format(new Date(`${date}T12:00:00Z`));
+}
+
 function relativeFreshness(value) {
   if (!value) return "Stats pending";
   const minutes = Math.max(0, Math.round((Date.now() - new Date(value)) / 60_000));
@@ -388,17 +396,62 @@ function playerRow(player) {
   const image = imageUrl
     ? `<img src="${imageUrl}" alt="" loading="lazy" decoding="async"><span class="fallback" hidden>${escapeHtml(initials(displayName))}</span>`
     : `<span class="fallback">${escapeHtml(initials(displayName))}</span>`;
+  const injuryBadge = player.injury
+    ? injuryTooltip(player, displayName)
+    : "";
 
   return `
     <li class="player-row">
       <div class="player-avatar">${image}</div>
       <div class="player-info">
-        <strong title="${escapeHtml(displayName)}">${escapeHtml(displayName)}</strong>
+        <div class="player-name">
+          <strong title="${escapeHtml(displayName)}">${escapeHtml(displayName)}</strong>
+          ${injuryBadge}
+        </div>
         <span class="player-meta">${meta}</span>
       </div>
       <div class="player-score"><strong>${player.stats.points}</strong><span>Pts</span></div>
     </li>
   `;
+}
+
+function injuryTooltip(player, displayName) {
+  const injury = player.injury;
+  const tooltipId = `injury-${player.playerId ?? normalizeDomId(displayName)}`;
+  const rows = [
+    ["Status", injury.status],
+    ["Injury", injury.type],
+    ["Reported", injury.updatedAt ? formatCalendarDate(injury.updatedAt) : null],
+    ["Expected return", injury.returnDate ? formatCalendarDate(injury.returnDate) : null]
+  ].filter(([, value]) => value);
+  const details = rows.map(([label, value]) => `
+    <div>
+      <dt>${escapeHtml(label)}</dt>
+      <dd>${escapeHtml(value)}</dd>
+    </div>
+  `).join("");
+  const note = injury.detail
+    ? `<p>${escapeHtml(injury.detail)}</p>`
+    : "";
+
+  return `
+    <span class="injury-badge" tabindex="0" aria-label="Injury details for ${escapeHtml(displayName)}" aria-describedby="${escapeHtml(tooltipId)}">
+      <span aria-hidden="true">🩹</span>
+      <span class="injury-tooltip" id="${escapeHtml(tooltipId)}" role="tooltip">
+        <span class="injury-tooltip-title">Injury update</span>
+        <dl>${details}</dl>
+        ${note}
+        <small>Source: ${escapeHtml(injury.source ?? "ESPN")}</small>
+      </span>
+    </span>
+  `;
+}
+
+function normalizeDomId(value) {
+  return String(value ?? "player")
+    .toLocaleLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
 }
 
 function bindEvents() {

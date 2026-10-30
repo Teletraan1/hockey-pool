@@ -3,14 +3,20 @@
   "leagueName": "The Pool Room",
   "seasonId": 20262027,
   "seasonLabel": "2026–27",
-  "generatedAt": "2026-10-30T17:58:28.543Z",
+  "generatedAt": "2026-10-30T19:13:06.226Z",
   "scoring": "1 point per goal or assist",
-  "source": "NHL public web API",
+  "source": "NHL public web API · injuries from ESPN",
+  "injuryFeed": {
+    "available": true,
+    "source": "ESPN",
+    "updatedAt": "2026-10-30T19:12:55Z"
+  },
   "summary": {
     "poolies": 10,
     "picks": 160,
     "resolvedPlayers": 160,
-    "playersWithStats": 159
+    "playersWithStats": 159,
+    "injuredPlayers": 12
   },
   "leaderboard": [
     {
@@ -641,6 +647,17 @@
         "plusMinus": 0,
         "pim": 0,
         "powerPlayPoints": 0
+      },
+      "injury": {
+        "playerName": "Aleksander Barkov",
+        "normalizedName": "aleksander barkov",
+        "team": "FLA",
+        "status": "Injured Reserve",
+        "type": "Lower Body",
+        "returnDate": "2026-11-27",
+        "detail": "Barkov (lower body) resumed skating Wednesday, George Richards of Florida Hockey Now reports.",
+        "updatedAt": "2026-10-29T16:13Z",
+        "source": "ESPN"
       }
     },
     {
@@ -707,6 +724,17 @@
         "plusMinus": 9,
         "pim": 10,
         "powerPlayPoints": 5
+      },
+      "injury": {
+        "playerName": "Joel Eriksson Ek",
+        "normalizedName": "joel eriksson ek",
+        "team": "MIN",
+        "status": "Day-To-Day",
+        "type": "Undisclosed",
+        "returnDate": "2026-11-01",
+        "detail": "day-to-day",
+        "updatedAt": "2026-10-30T16:32Z",
+        "source": "ESPN"
       }
     },
     {
@@ -861,6 +889,17 @@
         "plusMinus": 6,
         "pim": 2,
         "powerPlayPoints": 2
+      },
+      "injury": {
+        "playerName": "Nick Suzuki",
+        "normalizedName": "nick suzuki",
+        "team": "MTL",
+        "status": "Out",
+        "type": "Upper Body",
+        "returnDate": "2026-11-18",
+        "detail": "out",
+        "updatedAt": "2026-10-22T15:30Z",
+        "source": "ESPN"
       }
     },
     {
@@ -1719,6 +1758,17 @@
         "plusMinus": -5,
         "pim": 4,
         "powerPlayPoints": 4
+      },
+      "injury": {
+        "playerName": "John Tavares",
+        "normalizedName": "john tavares",
+        "team": "TOR",
+        "status": "Injured Reserve",
+        "type": "Lower Body",
+        "returnDate": "2026-11-27",
+        "detail": "ir",
+        "updatedAt": "2026-10-17T20:19Z",
+        "source": "ESPN"
       }
     },
     {
@@ -1763,6 +1813,17 @@
         "plusMinus": -4,
         "pim": 4,
         "powerPlayPoints": 1
+      },
+      "injury": {
+        "playerName": "Travis Konecny",
+        "normalizedName": "travis konecny",
+        "team": "PHI",
+        "status": "Injured Reserve",
+        "type": "Lower Body",
+        "returnDate": "2026-11-03",
+        "detail": "Konecny (lower body) was placed on injured reserve Sunday, according to the NHL media site.",
+        "updatedAt": "2026-10-11T18:01Z",
+        "source": "ESPN"
       }
     },
     {
@@ -1807,6 +1868,17 @@
         "plusMinus": -7,
         "pim": 4,
         "powerPlayPoints": 2
+      },
+      "injury": {
+        "playerName": "Bryan Rust",
+        "normalizedName": "bryan rust",
+        "team": "PIT",
+        "status": "Injured Reserve",
+        "type": "Lower Body",
+        "returnDate": "2026-12-05",
+        "detail": "Rust (lower body) will be re-evaluated in six weeks, Michelle Crechiolo of the Penguins' official site reports Thursday.",
+        "updatedAt": "2026-10-22T15:54Z",
+        "source": "ESPN"
       }
     },
     {
@@ -2071,6 +2143,17 @@
         "plusMinus": 0,
         "pim": 2,
         "powerPlayPoints": 0
+      },
+      "injury": {
+        "playerName": "Ivan Demidov",
+        "normalizedName": "ivan demidov",
+        "team": "MTL",
+        "status": "Injured Reserve",
+        "type": "Lower Body",
+        "returnDate": "2026-10-31",
+        "detail": "Demidov (lower body) was placed on injured reserve by the Canadiens on Tuesday, per the NHL media site.",
+        "updatedAt": "2026-10-06T21:16Z",
+        "source": "ESPN"
       }
     },
     {
@@ -2577,6 +2660,17 @@
         "plusMinus": -3,
         "pim": 0,
         "powerPlayPoints": 1
+      },
+      "injury": {
+        "playerName": "Alexander Wennberg",
+        "normalizedName": "alexander wennberg",
+        "team": "SJ",
+        "status": "Injured Reserve",
+        "type": "Upper Body",
+        "returnDate": "2026-11-09",
+        "detail": "ir",
+        "updatedAt": "2026-10-28T16:46Z",
+        "source": "ESPN"
       }
     },
     {
@@ -2709,6 +2803,17 @@
         "plusMinus": 0,
         "pim": 0,
         "powerPlayPoints": 0
+      },
+      "injury": {
+        "playerName": "Mathew Barzal",
+        "normalizedName": "mathew barzal",
+        "team": "NYI",
+        "status": "Injured Reserve",
+        "type": "Knee",
+        "returnDate": "2026-11-07",
+        "detail": "Barzal (knee) will not join the Islanders for their two-game road trip, Andrew Gross of Newsday reports Thursday.",
+        "updatedAt": "2026-10-15T16:57Z",
+        "source": "ESPN"
       }
     },
     {
@@ -2775,6 +2880,17 @@
         "plusMinus": 3,
         "pim": 4,
         "powerPlayPoints": 3
+      },
+      "injury": {
+        "playerName": "Dylan Larkin",
+        "normalizedName": "dylan larkin",
+        "team": "DET",
+        "status": "Injured Reserve",
+        "type": "Suspension",
+        "returnDate": "2026-11-14",
+        "detail": "ir-nr",
+        "updatedAt": "2026-10-29T22:03Z",
+        "source": "ESPN"
       }
     },
     {
@@ -2819,6 +2935,17 @@
         "plusMinus": -1,
         "pim": 2,
         "powerPlayPoints": 1
+      },
+      "injury": {
+        "playerName": "Zach Hyman",
+        "normalizedName": "zach hyman",
+        "team": "EDM",
+        "status": "Injured Reserve",
+        "type": "Neck",
+        "returnDate": "2026-11-03",
+        "detail": "ir",
+        "updatedAt": "2026-10-28T16:04Z",
+        "source": "ESPN"
       }
     },
     {
@@ -3391,6 +3518,17 @@
         "plusMinus": -3,
         "pim": 8,
         "powerPlayPoints": 8
+      },
+      "injury": {
+        "playerName": "Kirill Marchenko",
+        "normalizedName": "kirill marchenko",
+        "team": "TOR",
+        "status": "Injured Reserve",
+        "type": "Lower Body",
+        "returnDate": "2026-11-17",
+        "detail": "ir",
+        "updatedAt": "2026-10-29T17:28Z",
+        "source": "ESPN"
       }
     },
     {
