@@ -1,4 +1,4 @@
-import { differenceFromLeader } from "./chart.js";
+import { differenceFromLeader, filterVisibleSeries } from "./chart.js";
 
 const state = {
   data: null,
@@ -19,7 +19,8 @@ const elements = {
   chart: document.querySelector("#points-chart"),
   chartLegend: document.querySelector("#chart-legend"),
   chartTooltip: document.querySelector("#chart-tooltip"),
-  chartMode: document.querySelector("#chart-mode")
+  chartMode: document.querySelector("#chart-mode"),
+  chartShowAll: document.querySelector("#chart-show-all")
 };
 
 const chartColors = [
@@ -208,8 +209,8 @@ function renderPointsChart() {
     `;
   }).join("");
 
-  const paths = series.map((item) => {
-    const hidden = state.hiddenSeries.has(item.name);
+  const visibleSeries = filterVisibleSeries(series, state.hiddenSeries);
+  const paths = visibleSeries.map((item) => {
     const path = item.points.map((point, index) => {
       const command = index === 0 ? "M" : "L";
       return `${command}${x(times[index]).toFixed(2)},${y(point.value).toFixed(2)}`;
@@ -217,7 +218,7 @@ function renderPointsChart() {
     const last = item.points.at(-1);
     const color = colorByName.get(item.name);
     return `
-      <g data-chart-series="${escapeHtml(item.name)}" style="--series-color:${color}" ${hidden ? "hidden" : ""}>
+      <g data-chart-series="${escapeHtml(item.name)}" style="--series-color:${color}">
         <path class="chart-series" d="${path}"></path>
         <circle class="chart-end-dot" cx="${x(times.at(-1))}" cy="${y(last.value)}" r="4"></circle>
       </g>
@@ -229,7 +230,7 @@ function renderPointsChart() {
       ${yGrid}
       ${xGrid}
       ${paths}
-      <line class="chart-crosshair" id="chart-crosshair" x1="0" x2="0" y1="${margin.top}" y2="${height - margin.bottom}" hidden></line>
+      <line class="chart-crosshair is-hidden" id="chart-crosshair" x1="0" x2="0" y1="${margin.top}" y2="${height - margin.bottom}"></line>
       <rect class="chart-hit-area" x="${margin.left}" y="${margin.top}" width="${plotWidth}" height="${plotHeight}"></rect>
     </svg>
   `;
@@ -242,11 +243,18 @@ function renderPointsChart() {
     const visible = !state.hiddenSeries.has(item.name);
     return `
       <button class="legend-button" type="button" data-series-name="${escapeHtml(item.name)}" aria-pressed="${visible}" style="--series-color:${colorByName.get(item.name)}">
-        <span class="legend-swatch" aria-hidden="true"></span>
-        ${escapeHtml(item.name)} <strong>${formatChartValue(item.latest)}</strong>
+        <span class="legend-label"><span class="legend-swatch" aria-hidden="true"></span>${escapeHtml(item.name)}</span>
+        <strong>${formatChartValue(item.latest)}</strong>
       </button>
     `;
   }).join("");
+  elements.chartShowAll.disabled = state.hiddenSeries.size === 0;
+  elements.chartMode.querySelectorAll("[data-chart-mode]").forEach((button) => {
+    button.setAttribute(
+      "aria-pressed",
+      String(button.dataset.chartMode === state.chartMode)
+    );
+  });
 
   const startLabel = new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" })
     .format(new Date(`${dates[0]}T12:00:00Z`));
@@ -286,7 +294,7 @@ function renderPointsChart() {
         : closest
     , 0);
     const crosshairX = x(times[index]);
-    crosshair.hidden = false;
+    crosshair.classList.remove("is-hidden");
     crosshair.setAttribute("x1", crosshairX);
     crosshair.setAttribute("x2", crosshairX);
 
@@ -310,7 +318,7 @@ function renderPointsChart() {
     elements.chartTooltip.style.top = `${Math.max(10, Math.min(event.clientY - 35, window.innerHeight - 290))}px`;
   });
   svg.addEventListener("pointerleave", () => {
-    crosshair.hidden = true;
+    crosshair.classList.add("is-hidden");
     elements.chartTooltip.hidden = true;
   });
 }
@@ -415,8 +423,16 @@ function bindEvents() {
     renderPointsChart();
   });
 
-  elements.chartMode.addEventListener("change", () => {
-    state.chartMode = elements.chartMode.value;
+  elements.chartMode.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-chart-mode]");
+    if (!button || button.dataset.chartMode === state.chartMode) return;
+    state.chartMode = button.dataset.chartMode;
+    elements.chartTooltip.hidden = true;
+    renderPointsChart();
+  });
+
+  elements.chartShowAll.addEventListener("click", () => {
+    state.hiddenSeries.clear();
     elements.chartTooltip.hidden = true;
     renderPointsChart();
   });

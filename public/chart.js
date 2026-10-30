@@ -18,3 +18,8 @@ export function differenceFromLeader(series) {
     }))
   }));
 }
+
+export function filterVisibleSeries(series, hiddenNames) {
+  const hidden = new Set(hiddenNames);
+  return series.filter((item) => !hidden.has(item.name));
+}

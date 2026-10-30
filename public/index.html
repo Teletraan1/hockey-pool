@@ -110,21 +110,27 @@
               <h3 id="chart-title">Points accumulated</h3>
               <p id="chart-description">Follow the race from opening night to today. Select a poolie to show or hide their line.</p>
             </div>
-            <div class="chart-tools">
-              <label class="chart-mode-control" for="chart-mode">
-                <span>Plot</span>
-                <select id="chart-mode">
-                  <option value="total">Accumulated points</option>
-                  <option value="leader">Points behind leader</option>
-                </select>
-              </label>
-              <div class="chart-key">
-                <span aria-hidden="true"></span>
-                <span id="chart-key-label">Cumulative pool points</span>
-              </div>
+            <div class="chart-key">
+              <span aria-hidden="true"></span>
+              <span id="chart-key-label">Cumulative pool points</span>
             </div>
           </header>
-          <div class="chart-legend" id="chart-legend" aria-label="Toggle poolies on the chart"></div>
+          <div class="chart-controls" aria-label="Chart controls">
+            <fieldset class="chart-mode-control">
+              <legend>Plot view</legend>
+              <div class="chart-mode-toggle" id="chart-mode">
+                <button type="button" data-chart-mode="total" aria-pressed="true">Accumulated</button>
+                <button type="button" data-chart-mode="leader" aria-pressed="false">Behind leader</button>
+              </div>
+            </fieldset>
+            <div class="chart-poolie-controls">
+              <div class="chart-control-heading">
+                <span><strong>Poolies</strong> · Toggle plotlines</span>
+                <button class="chart-reset" id="chart-show-all" type="button" disabled>Show all</button>
+              </div>
+              <div class="chart-legend" id="chart-legend" aria-label="Toggle poolie plotlines"></div>
+            </div>
+          </div>
           <div class="chart-stage" id="points-chart" role="img" aria-label="Loading cumulative pool points chart">
             <div class="chart-loading">Replaying the season…</div>
           </div>

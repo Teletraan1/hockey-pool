@@ -1,6 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { differenceFromLeader } from "../public/chart.js";
+import {
+  differenceFromLeader,
+  filterVisibleSeries
+} from "../public/chart.js";
 import {
   buildPointsHistory,
   currentSeasonId,
@@ -146,5 +149,18 @@ test("plots every poolie at or below the leader on each date", () => {
       Math.max(...result.map((item) => item.points[index].value))
     ),
     [0, 0]
+  );
+});
+
+test("removes hidden poolies before chart paths are rendered", () => {
+  const series = [
+    { name: "A", points: [{ value: 4 }] },
+    { name: "B", points: [{ value: 6 }] },
+    { name: "C", points: [{ value: 2 }] }
+  ];
+
+  assert.deepEqual(
+    filterVisibleSeries(series, new Set(["A", "C"])).map((item) => item.name),
+    ["B"]
   );
 });
