@@ -1,4 +1,7 @@
-import { differenceFromLeader, filterVisibleSeries } from "./chart.js";
+import {
+  differenceFromLeader,
+  filterVisibleSeries
+} from "./chart.js?v=__ASSET_VERSION__";
 
 const state = {
   data: null,

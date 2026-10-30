@@ -18,6 +18,7 @@ const draft = JSON.parse(await readFile("public/data/draft.json", "utf8"));
 const stats = JSON.parse(await readFile("public/data/stats.json", "utf8"));
 const history = JSON.parse(await readFile("public/data/history.json", "utf8"));
 const html = await readFile("public/index.html", "utf8");
+const app = await readFile("public/app.js", "utf8");
 
 const assert = (condition, message) => {
   if (!condition) throw new Error(message);
@@ -62,6 +63,14 @@ for (const poolie of stats.leaderboard) {
 }
 assert(html.includes("styles.css"), "index.html must load styles.css.");
 assert(html.includes("app.js"), "index.html must load app.js.");
+assert(
+  html.match(/__ASSET_VERSION__/g)?.length === 2,
+  "index.html must version its stylesheet and app module."
+);
+assert(
+  app.includes("chart.js?v=__ASSET_VERSION__"),
+  "app.js must version its chart module."
+);
 assert(html.includes('id="leaderboard"'), "The page needs a leaderboard landmark.");
 assert(html.includes('id="draft"'), "The page needs a draft-board landmark.");
 assert(html.includes('id="points-chart"'), "The page needs a points chart landmark.");

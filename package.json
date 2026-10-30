@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node scripts/serve.mjs",
+    "build": "node scripts/build.mjs",
     "update": "node scripts/update-stats.mjs",
     "check": "node scripts/validate.mjs",
     "test": "node test/lib.test.mjs"
