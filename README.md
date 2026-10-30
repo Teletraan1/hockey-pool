@@ -12,7 +12,7 @@ A responsive NHL hockey pool dashboard generated from `HockeyDraft2627.xlsx`. Th
 
 ## Run locally
 
-Requirements: Node.js 20 or newer.
+Requirements: Node.js 24 or newer.
 
 ```powershell
 npm install
