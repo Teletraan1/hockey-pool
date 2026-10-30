@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import {
   buildPointsHistory,
   currentSeasonId,
+  playerIdFor,
   queryForPlayer,
   rankPoolies,
   seasonLabel,
@@ -70,6 +71,9 @@ async function fetchJson(url, attempts = 3) {
 }
 
 async function resolvePlayerId(draftName) {
+  const override = playerIdFor(draftName);
+  if (override) return override;
+
   const cached = previousByName.get(draftName)?.playerId;
   if (cached) return Number(cached);
 

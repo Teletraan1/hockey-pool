@@ -3,22 +3,22 @@
   "leagueName": "The Pool Room",
   "seasonId": 20262027,
   "seasonLabel": "2026–27",
-  "generatedAt": "2026-10-30T17:27:37.264Z",
+  "generatedAt": "2026-10-30T17:58:28.543Z",
   "scoring": "1 point per goal or assist",
   "source": "NHL public web API",
   "summary": {
     "poolies": 10,
     "picks": 160,
     "resolvedPlayers": 160,
-    "playersWithStats": 158
+    "playersWithStats": 159
   },
   "leaderboard": [
     {
       "name": "Tuckey",
       "gamesPlayed": 204,
-      "goals": 54,
-      "assists": 166,
-      "points": 220,
+      "goals": 55,
+      "assists": 177,
+      "points": 232,
       "activePlayers": 16,
       "totalPlayers": 16,
       "rank": 1
@@ -64,22 +64,22 @@
       "rank": 5
     },
     {
+      "name": "Marty",
+      "gamesPlayed": 195,
+      "goals": 69,
+      "assists": 103,
+      "points": 172,
+      "activePlayers": 16,
+      "totalPlayers": 16,
+      "rank": 6
+    },
+    {
       "name": "Steve H",
       "gamesPlayed": 209,
       "goals": 54,
       "assists": 108,
       "points": 162,
       "activePlayers": 16,
-      "totalPlayers": 16,
-      "rank": 6
-    },
-    {
-      "name": "Marty",
-      "gamesPlayed": 182,
-      "goals": 65,
-      "assists": 93,
-      "points": 158,
-      "activePlayers": 15,
       "totalPlayers": 16,
       "rank": 7
     },
@@ -185,22 +185,22 @@
       "poolie": "Tuckey",
       "draftName": "Elias Pettersson",
       "round": 4,
-      "playerId": 8483678,
+      "playerId": 8480012,
       "officialName": "Elias Pettersson",
       "team": "VAN",
-      "position": "D",
-      "sweaterNumber": 25,
-      "headshot": "https://assets.nhle.com/mugs/nhl/20262027/VAN/8483678.png",
+      "position": "C",
+      "sweaterNumber": 40,
+      "headshot": "https://assets.nhle.com/mugs/nhl/20262027/VAN/8480012.png",
       "teamLogo": "https://assets.nhle.com/logos/nhl/svg/VAN_light.svg",
       "status": "active",
       "stats": {
         "gamesPlayed": 15,
-        "goals": 3,
-        "assists": 1,
-        "points": 4,
-        "plusMinus": 1,
-        "pim": 8,
-        "powerPlayPoints": 0
+        "goals": 4,
+        "assists": 12,
+        "points": 16,
+        "plusMinus": -1,
+        "pim": 4,
+        "powerPlayPoints": 6
       }
     },
     {
@@ -515,22 +515,22 @@
       "poolie": "Marty",
       "draftName": "Jack Hughes",
       "round": 3,
-      "playerId": 8448071,
+      "playerId": 8481559,
       "officialName": "Jack Hughes",
-      "team": null,
-      "position": "D",
-      "sweaterNumber": 2,
-      "headshot": "https://assets.nhle.com/mugs/nhl/latest/8448071.png",
-      "teamLogo": null,
-      "status": "no-stats",
+      "team": "NJD",
+      "position": "C",
+      "sweaterNumber": 86,
+      "headshot": "https://assets.nhle.com/mugs/nhl/20262027/NJD/8481559.png",
+      "teamLogo": "https://assets.nhle.com/logos/nhl/svg/NJD_light.svg",
+      "status": "active",
       "stats": {
-        "gamesPlayed": 0,
-        "goals": 0,
-        "assists": 0,
-        "points": 0,
-        "plusMinus": 0,
+        "gamesPlayed": 13,
+        "goals": 4,
+        "assists": 10,
+        "points": 14,
+        "plusMinus": 3,
         "pim": 0,
-        "powerPlayPoints": 0
+        "powerPlayPoints": 4
       }
     },
     {

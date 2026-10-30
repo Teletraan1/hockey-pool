@@ -6,6 +6,14 @@ export const PLAYER_ALIASES = Object.freeze({
   "Ryan Nugent-Hopkins": "Ryan Nugent Hopkins"
 });
 
+// NHL search can return retired or same-name players before the intended pick.
+// Keep ambiguous pool picks pinned to the league's stable player IDs.
+export const PLAYER_ID_OVERRIDES = Object.freeze({
+  "Elias Pettersson": 8480012,
+  "Jack Hughes": 8481559,
+  "Mathew Barzal": 8478445
+});
+
 export function normalizeName(value) {
   return String(value ?? "")
     .normalize("NFD")
@@ -17,6 +25,10 @@ export function normalizeName(value) {
 
 export function queryForPlayer(draftName) {
   return PLAYER_ALIASES[draftName] ?? draftName;
+}
+
+export function playerIdFor(draftName) {
+  return PLAYER_ID_OVERRIDES[draftName] ?? null;
 }
 
 export function selectSearchMatch(draftName, results) {

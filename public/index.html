@@ -108,11 +108,20 @@
             <div>
               <p class="eyebrow">Season trajectory</p>
               <h3 id="chart-title">Points accumulated</h3>
-              <p>Follow the race from opening night to today. Select a poolie to show or hide their line.</p>
+              <p id="chart-description">Follow the race from opening night to today. Select a poolie to show or hide their line.</p>
             </div>
-            <div class="chart-key">
-              <span aria-hidden="true"></span>
-              Cumulative pool points
+            <div class="chart-tools">
+              <label class="chart-mode-control" for="chart-mode">
+                <span>Plot</span>
+                <select id="chart-mode">
+                  <option value="total">Accumulated points</option>
+                  <option value="leader">Difference from leader</option>
+                </select>
+              </label>
+              <div class="chart-key">
+                <span aria-hidden="true"></span>
+                <span id="chart-key-label">Cumulative pool points</span>
+              </div>
             </div>
           </header>
           <div class="chart-legend" id="chart-legend" aria-label="Toggle poolies on the chart"></div>
@@ -122,7 +131,7 @@
           <div class="chart-tooltip" id="chart-tooltip" hidden></div>
           <footer class="chart-footer">
             <span id="chart-range">2026–27 regular season</span>
-            <span>Goals + assists</span>
+            <span id="chart-measure">Goals + assists</span>
           </footer>
         </article>
       </section>

@@ -3,6 +3,7 @@ const state = {
   history: null,
   activePoolie: "All",
   query: "",
+  chartMode: "total",
   hiddenSeries: new Set()
 };
 
@@ -15,7 +16,8 @@ const elements = {
   empty: document.querySelector("#empty-state"),
   chart: document.querySelector("#points-chart"),
   chartLegend: document.querySelector("#chart-legend"),
-  chartTooltip: document.querySelector("#chart-tooltip")
+  chartTooltip: document.querySelector("#chart-tooltip"),
+  chartMode: document.querySelector("#chart-mode")
 };
 
 const chartColors = [
@@ -135,7 +137,19 @@ function renderPointsChart() {
     return;
   }
 
-  const { dates, series } = state.history;
+  const { dates, series: cumulativeSeries } = state.history;
+  const leaderName = state.data.leaderboard[0]?.name;
+  const leaderSeries = cumulativeSeries.find((item) => item.name === leaderName);
+  const isRelative = state.chartMode === "leader" && leaderSeries;
+  const series = isRelative
+    ? cumulativeSeries.map((item) => ({
+        ...item,
+        points: item.points.map((point, index) => ({
+          ...point,
+          value: point.value - (leaderSeries.points[index]?.value ?? 0)
+        }))
+      }))
+    : cumulativeSeries;
   const width = 1000;
   const height = 430;
   const margin = { top: 22, right: 28, bottom: 48, left: 58 };
@@ -144,26 +158,44 @@ function renderPointsChart() {
   const times = dates.map((date) => new Date(`${date}T12:00:00Z`).getTime());
   const minTime = times[0];
   const maxTime = times.at(-1);
-  const rawMax = Math.max(
-    0,
-    ...series.flatMap((item) => item.points.map((point) => point.value))
+  const values = series.flatMap((item) =>
+    item.points.map((point) => point.value)
   );
-  const tickSize = rawMax > 250 ? 100 : rawMax > 100 ? 50 : 25;
-  const yMax = Math.max(tickSize, Math.ceil(rawMax / tickSize) * tickSize);
+  const rawMin = Math.min(0, ...values);
+  const rawMax = Math.max(0, ...values);
+  const roughTick = Math.max(1, (rawMax - rawMin) / 5);
+  const magnitude = 10 ** Math.floor(Math.log10(roughTick));
+  const normalizedTick = roughTick / magnitude;
+  const tickFactor = normalizedTick <= 1 ? 1 : normalizedTick <= 2 ? 2 : normalizedTick <= 5 ? 5 : 10;
+  const tickSize = tickFactor * magnitude;
+  let yMin = Math.floor(rawMin / tickSize) * tickSize;
+  let yMax = Math.ceil(rawMax / tickSize) * tickSize;
+  if (yMin === yMax) {
+    yMin = isRelative ? -tickSize : 0;
+    yMax = tickSize;
+  }
   const x = (time) =>
     margin.left +
     ((time - minTime) / Math.max(1, maxTime - minTime)) * plotWidth;
-  const y = (value) => margin.top + plotHeight - (value / yMax) * plotHeight;
+  const y = (value) =>
+    margin.top + ((yMax - value) / (yMax - yMin)) * plotHeight;
+  const formatChartValue = (value) => {
+    if (!isRelative || value === 0) return String(value);
+    return value > 0 ? `+${value}` : `−${Math.abs(value)}`;
+  };
   const colorByName = new Map(
     series.map((item, index) => [item.name, chartColors[index % chartColors.length]])
   );
 
-  const yGrid = Array.from({ length: 6 }, (_, index) => {
-    const value = Math.round((yMax / 5) * index);
+  const yTicks = [];
+  for (let value = yMin; value <= yMax + tickSize / 2; value += tickSize) {
+    yTicks.push(Math.round(value * 100) / 100);
+  }
+  const yGrid = yTicks.map((value) => {
     const position = y(value);
     return `
-      <line class="chart-grid-line ${index === 0 ? "major" : ""}" x1="${margin.left}" x2="${width - margin.right}" y1="${position}" y2="${position}"></line>
-      <text class="chart-axis-label" x="${margin.left - 11}" y="${position + 4}" text-anchor="end">${value}</text>
+      <line class="chart-grid-line ${value === 0 ? "major" : ""}" x1="${margin.left}" x2="${width - margin.right}" y1="${position}" y2="${position}"></line>
+      <text class="chart-axis-label" x="${margin.left - 11}" y="${position + 4}" text-anchor="end">${formatChartValue(value)}</text>
     `;
   }).join("");
 
@@ -217,7 +249,7 @@ function renderPointsChart() {
     return `
       <button class="legend-button" type="button" data-series-name="${escapeHtml(item.name)}" aria-pressed="${visible}" style="--series-color:${colorByName.get(item.name)}">
         <span class="legend-swatch" aria-hidden="true"></span>
-        ${escapeHtml(item.name)} <strong>${item.latest}</strong>
+        ${escapeHtml(item.name)} <strong>${formatChartValue(item.latest)}</strong>
       </button>
     `;
   }).join("");
@@ -228,9 +260,23 @@ function renderPointsChart() {
     .format(new Date(`${dates.at(-1)}T12:00:00Z`));
   document.querySelector("#chart-range").textContent = `${startLabel} – ${endLabel}`;
   const leader = ordered[0];
+  document.querySelector("#chart-title").textContent = isRelative
+    ? "Difference from leader"
+    : "Points accumulated";
+  document.querySelector("#chart-description").textContent = isRelative
+    ? `${leaderName} is the zero baseline. Every other line shows its points difference against the current leader.`
+    : "Follow the race from opening night to today. Select a poolie to show or hide their line.";
+  document.querySelector("#chart-key-label").textContent = isRelative
+    ? `${leaderName} baseline`
+    : "Cumulative pool points";
+  document.querySelector("#chart-measure").textContent = isRelative
+    ? `Difference vs ${leaderName}`
+    : "Goals + assists";
   elements.chart.setAttribute(
     "aria-label",
-    `Cumulative pool points from ${startLabel} to ${endLabel}. ${leader.name} leads with ${leader.latest} points.`
+    isRelative
+      ? `Pool points difference from current leader ${leaderName}, from ${startLabel} to ${endLabel}. ${leaderName} is the zero baseline.`
+      : `Cumulative pool points from ${startLabel} to ${endLabel}. ${leader.name} leads with ${leader.latest} points.`
   );
 
   const svg = elements.chart.querySelector("svg");
@@ -261,7 +307,7 @@ function renderPointsChart() {
       <time>${escapeHtml(dateLabel)}</time>
       ${visibleRows.map((row) => `
         <div class="chart-tooltip-row" style="--series-color:${colorByName.get(row.name)}">
-          <i aria-hidden="true"></i><span>${escapeHtml(row.name)}</span><strong>${row.value}</strong>
+          <i aria-hidden="true"></i><span>${escapeHtml(row.name)}</span><strong>${formatChartValue(row.value)}</strong>
         </div>
       `).join("")}
     `;
@@ -331,7 +377,9 @@ function playerRow(player) {
   const hasStats = player.stats.gamesPlayed > 0;
   const meta = hasStats
     ? `${player.team ?? "FA"} · ${player.position ?? "—"} · ${player.stats.goals}G ${player.stats.assists}A`
-    : `<span class="awaiting">Awaiting NHL stats</span>`;
+    : player.playerId
+      ? `${player.team ?? "NHL"} · ${player.position ?? "—"} · 0 GP this season`
+      : `<span class="awaiting">Awaiting NHL stats</span>`;
   const image = imageUrl
     ? `<img src="${imageUrl}" alt="" loading="lazy" decoding="async"><span class="fallback" hidden>${escapeHtml(initials(displayName))}</span>`
     : `<span class="fallback">${escapeHtml(initials(displayName))}</span>`;
@@ -370,6 +418,12 @@ function bindEvents() {
     const name = button.dataset.seriesName;
     if (state.hiddenSeries.has(name)) state.hiddenSeries.delete(name);
     else state.hiddenSeries.add(name);
+    renderPointsChart();
+  });
+
+  elements.chartMode.addEventListener("change", () => {
+    state.chartMode = elements.chartMode.value;
+    elements.chartTooltip.hidden = true;
     renderPointsChart();
   });
 }

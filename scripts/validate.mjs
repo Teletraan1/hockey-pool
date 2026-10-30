@@ -37,6 +37,18 @@ assert(
   new Set(stats.players.map((player) => player.draftName)).size === 160,
   "The stats snapshot must preserve all unique draft names."
 );
+const expectedPlayerIds = new Map([
+  ["Elias Pettersson", 8480012],
+  ["Jack Hughes", 8481559],
+  ["Mathew Barzal", 8478445]
+]);
+for (const [draftName, playerId] of expectedPlayerIds) {
+  const player = stats.players.find((item) => item.draftName === draftName);
+  assert(
+    player?.playerId === playerId,
+    `${draftName} must resolve to NHL player ${playerId}.`
+  );
+}
 assert(history.series.length === 10, "The history must contain 10 poolie series.");
 assert(history.dates.length >= 2, "The history must contain at least two dates.");
 for (const poolie of stats.leaderboard) {
@@ -52,5 +64,6 @@ assert(html.includes("app.js"), "index.html must load app.js.");
 assert(html.includes('id="leaderboard"'), "The page needs a leaderboard landmark.");
 assert(html.includes('id="draft"'), "The page needs a draft-board landmark.");
 assert(html.includes('id="points-chart"'), "The page needs a points chart landmark.");
+assert(html.includes('id="chart-mode"'), "The points chart needs a plot selector.");
 
 console.log("Validated 10 poolies, 160 unique picks, stats, and web assets.");

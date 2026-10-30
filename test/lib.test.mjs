@@ -4,6 +4,7 @@ import {
   buildPointsHistory,
   currentSeasonId,
   normalizeName,
+  playerIdFor,
   rankPoolies,
   selectSearchMatch,
   sumNhlSeason
@@ -20,6 +21,13 @@ test("selects exact normalized names and aliases", () => {
     { playerId: "2", name: "Alexander Barabanov" }
   ];
   assert.equal(selectSearchMatch("Barkov", results)?.playerId, "1");
+});
+
+test("pins ambiguous player names to the intended NHL IDs", () => {
+  assert.equal(playerIdFor("Elias Pettersson"), 8480012);
+  assert.equal(playerIdFor("Jack Hughes"), 8481559);
+  assert.equal(playerIdFor("Mathew Barzal"), 8478445);
+  assert.equal(playerIdFor("Connor McDavid"), null);
 });
 
 test("selects the NHL season around July", () => {
