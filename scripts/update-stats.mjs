@@ -2,6 +2,7 @@ import { readFile, rename, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
+  buildPointsHistory,
   currentSeasonId,
   queryForPlayer,
   rankPoolies,
@@ -13,6 +14,7 @@ import {
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const draftPath = resolve(root, "public/data/draft.json");
 const statsPath = resolve(root, "public/data/stats.json");
+const historyPath = resolve(root, "public/data/history.json");
 const seasonId = Number(process.env.NHL_SEASON ?? currentSeasonId());
 const concurrency = Number(process.env.NHL_CONCURRENCY ?? 8);
 const timeoutMs = Number(process.env.NHL_TIMEOUT_MS ?? 15_000);
@@ -187,12 +189,47 @@ const poolies = draft.poolies.map((poolie) => {
   );
 });
 
+const leaderboard = rankPoolies(poolies);
+const playersWithGames = players.filter(
+  (player) => player.playerId && player.stats.gamesPlayed > 0
+);
+console.log(`Loading game logs for ${playersWithGames.length} active skaters…`);
+const gameLogEntries = await mapConcurrent(
+  playersWithGames,
+  concurrency,
+  async (player) => {
+    const response = await fetchJson(
+      `https://api-web.nhle.com/v1/player/${player.playerId}/game-log/${seasonId}/2`
+    );
+    return [player.playerId, response.gameLog ?? []];
+  }
+);
+const gameLogsByPlayerId = Object.fromEntries(gameLogEntries);
+const generatedAt = new Date();
+const history = buildPointsHistory({
+  poolieNames: draft.poolies.map((poolie) => poolie.name),
+  players,
+  gameLogsByPlayerId,
+  seasonId,
+  generatedAt
+});
+
+for (const poolie of leaderboard) {
+  const historical = history.series.find((series) => series.name === poolie.name);
+  const historicalTotal = historical?.points.at(-1)?.value ?? 0;
+  if (historicalTotal !== poolie.points) {
+    throw new Error(
+      `History mismatch for ${poolie.name}: ${historicalTotal} historical points versus ${poolie.points} current points.`
+    );
+  }
+}
+
 const output = {
   schemaVersion: 1,
   leagueName: draft.leagueName,
   seasonId,
   seasonLabel: seasonLabel(seasonId),
-  generatedAt: new Date().toISOString(),
+  generatedAt: generatedAt.toISOString(),
   scoring: "1 point per goal or assist",
   source: "NHL public web API",
   summary: {
@@ -201,13 +238,20 @@ const output = {
     resolvedPlayers,
     playersWithStats: players.filter((player) => player.stats.gamesPlayed > 0).length
   },
-  leaderboard: rankPoolies(poolies),
+  leaderboard,
   players
 };
 
 const temporaryPath = `${statsPath}.tmp`;
+const temporaryHistoryPath = `${historyPath}.tmp`;
 await writeFile(temporaryPath, `${JSON.stringify(output, null, 2)}\n`, "utf8");
+await writeFile(
+  temporaryHistoryPath,
+  `${JSON.stringify(history, null, 2)}\n`,
+  "utf8"
+);
 await rename(temporaryPath, statsPath);
+await rename(temporaryHistoryPath, historyPath);
 console.log(
-  `Wrote ${statsPath}: ${successfulLandings} refreshed, ${resolvedPlayers} resolved.`
+  `Wrote stats and ${history.dates.length} chart dates: ${successfulLandings} refreshed, ${resolvedPlayers} resolved.`
 );

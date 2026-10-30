@@ -102,6 +102,29 @@
             </tbody>
           </table>
         </div>
+
+        <article class="chart-card" aria-labelledby="chart-title">
+          <header class="chart-header">
+            <div>
+              <p class="eyebrow">Season trajectory</p>
+              <h3 id="chart-title">Points accumulated</h3>
+              <p>Follow the race from opening night to today. Select a poolie to show or hide their line.</p>
+            </div>
+            <div class="chart-key">
+              <span aria-hidden="true"></span>
+              Cumulative pool points
+            </div>
+          </header>
+          <div class="chart-legend" id="chart-legend" aria-label="Toggle poolies on the chart"></div>
+          <div class="chart-stage" id="points-chart" role="img" aria-label="Loading cumulative pool points chart">
+            <div class="chart-loading">Replaying the season…</div>
+          </div>
+          <div class="chart-tooltip" id="chart-tooltip" hidden></div>
+          <footer class="chart-footer">
+            <span id="chart-range">2026–27 regular season</span>
+            <span>Goals + assists</span>
+          </footer>
+        </article>
       </section>
 
       <section class="stat-strip" aria-label="Pool summary">

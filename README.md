@@ -6,7 +6,7 @@ A responsive NHL hockey pool dashboard generated from `HockeyDraft2627.xlsx`. Th
 
 - Refreshes official NHL statistics every three hours through GitHub Actions.
 - Deploys a static, fast, mobile-friendly site to GitHub Pages.
-- Shows the live leaderboard, full draft board, player search, team totals, and data freshness.
+- Shows the live leaderboard, interactive cumulative-points graph, full draft board, player search, team totals, and data freshness.
 - Keeps prospects and unmatched picks visible instead of silently dropping them.
 - Requires no API keys, backend, database, or paid hosting.
 
@@ -53,7 +53,7 @@ Name differences in NHL data belong in `PLAYER_ALIASES` in `scripts/lib.mjs`. Th
 
 ## Data and scoring
 
-Statistics come from the public NHL web API. `scripts/update-stats.mjs` searches for each player, retrieves that player's current-season landing data, and writes a normalized snapshot. The dashboard uses regular-season goals plus assists. This project is unofficial and is not affiliated with the NHL.
+Statistics come from the public NHL web API. `scripts/update-stats.mjs` searches for each player, retrieves current-season totals and game logs, and writes normalized standings and history snapshots. The chart is rebuilt from every skater's game log and checked against the leaderboard before deployment. The dashboard uses regular-season goals plus assists. This project is unofficial and is not affiliated with the NHL.
 
 ## Project structure
 

@@ -1,7 +1,9 @@
 const state = {
   data: null,
+  history: null,
   activePoolie: "All",
-  query: ""
+  query: "",
+  hiddenSeries: new Set()
 };
 
 const elements = {
@@ -10,8 +12,24 @@ const elements = {
   draftGrid: document.querySelector("#draft-grid"),
   filters: document.querySelector("#poolie-filters"),
   search: document.querySelector("#player-search"),
-  empty: document.querySelector("#empty-state")
+  empty: document.querySelector("#empty-state"),
+  chart: document.querySelector("#points-chart"),
+  chartLegend: document.querySelector("#chart-legend"),
+  chartTooltip: document.querySelector("#chart-tooltip")
 };
+
+const chartColors = [
+  "#ef3f4f",
+  "#2d9ec7",
+  "#7657d8",
+  "#16a085",
+  "#e39a19",
+  "#a44b9b",
+  "#31546b",
+  "#e66b36",
+  "#58a84f",
+  "#d3547d"
+];
 
 const escapeHtml = (value) =>
   String(value ?? "")
@@ -111,6 +129,152 @@ function renderStandings(leaderboard) {
   `).join("");
 }
 
+function renderPointsChart() {
+  if (!state.history?.series?.length) {
+    elements.chart.innerHTML = '<div class="chart-loading">Season history is temporarily unavailable.</div>';
+    return;
+  }
+
+  const { dates, series } = state.history;
+  const width = 1000;
+  const height = 430;
+  const margin = { top: 22, right: 28, bottom: 48, left: 58 };
+  const plotWidth = width - margin.left - margin.right;
+  const plotHeight = height - margin.top - margin.bottom;
+  const times = dates.map((date) => new Date(`${date}T12:00:00Z`).getTime());
+  const minTime = times[0];
+  const maxTime = times.at(-1);
+  const rawMax = Math.max(
+    0,
+    ...series.flatMap((item) => item.points.map((point) => point.value))
+  );
+  const tickSize = rawMax > 250 ? 100 : rawMax > 100 ? 50 : 25;
+  const yMax = Math.max(tickSize, Math.ceil(rawMax / tickSize) * tickSize);
+  const x = (time) =>
+    margin.left +
+    ((time - minTime) / Math.max(1, maxTime - minTime)) * plotWidth;
+  const y = (value) => margin.top + plotHeight - (value / yMax) * plotHeight;
+  const colorByName = new Map(
+    series.map((item, index) => [item.name, chartColors[index % chartColors.length]])
+  );
+
+  const yGrid = Array.from({ length: 6 }, (_, index) => {
+    const value = Math.round((yMax / 5) * index);
+    const position = y(value);
+    return `
+      <line class="chart-grid-line ${index === 0 ? "major" : ""}" x1="${margin.left}" x2="${width - margin.right}" y1="${position}" y2="${position}"></line>
+      <text class="chart-axis-label" x="${margin.left - 11}" y="${position + 4}" text-anchor="end">${value}</text>
+    `;
+  }).join("");
+
+  const tickIndexes = [...new Set(Array.from({ length: 6 }, (_, index) =>
+    Math.round((dates.length - 1) * (index / 5))
+  ))];
+  const xGrid = tickIndexes.map((index) => {
+    const position = x(times[index]);
+    const label = new Intl.DateTimeFormat(undefined, {
+      month: "short",
+      day: "numeric"
+    }).format(new Date(`${dates[index]}T12:00:00Z`));
+    return `
+      <line class="chart-grid-line" x1="${position}" x2="${position}" y1="${margin.top}" y2="${height - margin.bottom}"></line>
+      <text class="chart-axis-label" x="${position}" y="${height - 18}" text-anchor="middle">${escapeHtml(label)}</text>
+    `;
+  }).join("");
+
+  const paths = series.map((item) => {
+    const hidden = state.hiddenSeries.has(item.name);
+    const path = item.points.map((point, index) => {
+      const command = index === 0 ? "M" : "L";
+      return `${command}${x(times[index]).toFixed(2)},${y(point.value).toFixed(2)}`;
+    }).join(" ");
+    const last = item.points.at(-1);
+    const color = colorByName.get(item.name);
+    return `
+      <g data-chart-series="${escapeHtml(item.name)}" style="--series-color:${color}" ${hidden ? "hidden" : ""}>
+        <path class="chart-series" d="${path}"></path>
+        <circle class="chart-end-dot" cx="${x(times.at(-1))}" cy="${y(last.value)}" r="4"></circle>
+      </g>
+    `;
+  }).join("");
+
+  elements.chart.innerHTML = `
+    <svg class="chart-svg" viewBox="0 0 ${width} ${height}" aria-hidden="true">
+      ${yGrid}
+      ${xGrid}
+      ${paths}
+      <line class="chart-crosshair" id="chart-crosshair" x1="0" x2="0" y1="${margin.top}" y2="${height - margin.bottom}" hidden></line>
+      <rect class="chart-hit-area" x="${margin.left}" y="${margin.top}" width="${plotWidth}" height="${plotHeight}"></rect>
+    </svg>
+  `;
+
+  const ordered = state.data.leaderboard.map((poolie) => {
+    const item = series.find((candidate) => candidate.name === poolie.name);
+    return { ...item, latest: item?.points.at(-1)?.value ?? 0 };
+  });
+  elements.chartLegend.innerHTML = ordered.map((item) => {
+    const visible = !state.hiddenSeries.has(item.name);
+    return `
+      <button class="legend-button" type="button" data-series-name="${escapeHtml(item.name)}" aria-pressed="${visible}" style="--series-color:${colorByName.get(item.name)}">
+        <span class="legend-swatch" aria-hidden="true"></span>
+        ${escapeHtml(item.name)} <strong>${item.latest}</strong>
+      </button>
+    `;
+  }).join("");
+
+  const startLabel = new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" })
+    .format(new Date(`${dates[0]}T12:00:00Z`));
+  const endLabel = new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric" })
+    .format(new Date(`${dates.at(-1)}T12:00:00Z`));
+  document.querySelector("#chart-range").textContent = `${startLabel} – ${endLabel}`;
+  const leader = ordered[0];
+  elements.chart.setAttribute(
+    "aria-label",
+    `Cumulative pool points from ${startLabel} to ${endLabel}. ${leader.name} leads with ${leader.latest} points.`
+  );
+
+  const svg = elements.chart.querySelector("svg");
+  const crosshair = svg.querySelector("#chart-crosshair");
+  svg.addEventListener("pointermove", (event) => {
+    const bounds = svg.getBoundingClientRect();
+    const svgX = ((event.clientX - bounds.left) / bounds.width) * width;
+    const ratio = Math.max(0, Math.min(1, (svgX - margin.left) / plotWidth));
+    const targetTime = minTime + ratio * (maxTime - minTime);
+    const index = times.reduce((closest, time, candidate) =>
+      Math.abs(time - targetTime) < Math.abs(times[closest] - targetTime)
+        ? candidate
+        : closest
+    , 0);
+    const crosshairX = x(times[index]);
+    crosshair.hidden = false;
+    crosshair.setAttribute("x1", crosshairX);
+    crosshair.setAttribute("x2", crosshairX);
+
+    const visibleRows = series
+      .filter((item) => !state.hiddenSeries.has(item.name))
+      .map((item) => ({ name: item.name, value: item.points[index].value }))
+      .sort((a, b) => b.value - a.value || a.name.localeCompare(b.name));
+    const dateLabel = new Intl.DateTimeFormat(undefined, {
+      dateStyle: "medium"
+    }).format(new Date(`${dates[index]}T12:00:00Z`));
+    elements.chartTooltip.innerHTML = `
+      <time>${escapeHtml(dateLabel)}</time>
+      ${visibleRows.map((row) => `
+        <div class="chart-tooltip-row" style="--series-color:${colorByName.get(row.name)}">
+          <i aria-hidden="true"></i><span>${escapeHtml(row.name)}</span><strong>${row.value}</strong>
+        </div>
+      `).join("")}
+    `;
+    elements.chartTooltip.hidden = false;
+    elements.chartTooltip.style.left = `${Math.min(event.clientX + 14, window.innerWidth - 225)}px`;
+    elements.chartTooltip.style.top = `${Math.max(10, Math.min(event.clientY - 35, window.innerHeight - 290))}px`;
+  });
+  svg.addEventListener("pointerleave", () => {
+    crosshair.hidden = true;
+    elements.chartTooltip.hidden = true;
+  });
+}
+
 function renderFilters(leaderboard) {
   const names = ["All", ...leaderboard.map((poolie) => poolie.name)];
   elements.filters.innerHTML = names.map((name) => `
@@ -199,6 +363,15 @@ function bindEvents() {
     state.query = elements.search.value;
     renderDraft();
   });
+
+  elements.chartLegend.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-series-name]");
+    if (!button) return;
+    const name = button.dataset.seriesName;
+    if (state.hiddenSeries.has(name)) state.hiddenSeries.delete(name);
+    else state.hiddenSeries.add(name);
+    renderPointsChart();
+  });
 }
 
 function showError(error) {
@@ -213,15 +386,20 @@ function showError(error) {
 
 async function boot() {
   try {
-    const response = await fetch("data/stats.json", { cache: "no-store" });
-    if (!response.ok) throw new Error(`Stats request failed: ${response.status}`);
-    state.data = await response.json();
+    const [statsResponse, historyResponse] = await Promise.all([
+      fetch("data/stats.json", { cache: "no-store" }),
+      fetch("data/history.json", { cache: "no-store" })
+    ]);
+    if (!statsResponse.ok) throw new Error(`Stats request failed: ${statsResponse.status}`);
+    state.data = await statsResponse.json();
+    if (historyResponse.ok) state.history = await historyResponse.json();
     if (!state.data.players.length) {
       throw new Error("The first NHL stats refresh has not completed yet.");
     }
     renderOverview(state.data);
     renderPodium(state.data.leaderboard);
     renderStandings(state.data.leaderboard);
+    renderPointsChart();
     renderFilters(state.data.leaderboard);
     renderDraft();
     bindEvents();

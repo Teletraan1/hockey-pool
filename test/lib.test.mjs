@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
+  buildPointsHistory,
   currentSeasonId,
   normalizeName,
   rankPoolies,
@@ -70,4 +71,41 @@ test("uses competition ranking for tied totals", () => {
     { name: "C", points: 8, goals: 4, assists: 4 }
   ]);
   assert.deepEqual(ranked.map(({ name, rank }) => [name, rank]), [["A", 1], ["B", 1], ["C", 3]]);
+});
+
+test("builds cumulative points history by poolie and date", () => {
+  const history = buildPointsHistory({
+    poolieNames: ["A", "B"],
+    players: [
+      { poolie: "A", playerId: 1 },
+      { poolie: "A", playerId: 2 },
+      { poolie: "B", playerId: 3 }
+    ],
+    gameLogsByPlayerId: {
+      1: [
+        { gameDate: "2026-10-10", points: 2 },
+        { gameDate: "2026-10-12", points: 1 }
+      ],
+      2: [{ gameDate: "2026-10-10", points: 1 }],
+      3: [{ gameDate: "2026-10-11", points: 4 }]
+    },
+    seasonId: 20262027,
+    generatedAt: new Date("2026-10-13T12:00:00Z")
+  });
+
+  assert.deepEqual(history.dates, [
+    "2026-10-09",
+    "2026-10-10",
+    "2026-10-11",
+    "2026-10-12",
+    "2026-10-13"
+  ]);
+  assert.deepEqual(
+    history.series[0].points.map((point) => point.value),
+    [0, 3, 3, 4, 4]
+  );
+  assert.deepEqual(
+    history.series[1].points.map((point) => point.value),
+    [0, 0, 4, 4, 4]
+  );
 });

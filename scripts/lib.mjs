@@ -104,3 +104,62 @@ export function rankPoolies(poolies) {
     return { ...poolie, rank: lastRank };
   });
 }
+
+export function buildPointsHistory({
+  poolieNames,
+  players,
+  gameLogsByPlayerId,
+  seasonId,
+  generatedAt = new Date()
+}) {
+  const gameDates = new Set();
+  for (const games of Object.values(gameLogsByPlayerId)) {
+    for (const game of games) {
+      if (game.gameDate) gameDates.add(game.gameDate);
+    }
+  }
+
+  const sortedGameDates = [...gameDates].sort();
+  const today = generatedAt.toISOString().slice(0, 10);
+  const firstGameDate = sortedGameDates[0] ?? today;
+  const openingDate = new Date(`${firstGameDate}T00:00:00Z`);
+  openingDate.setUTCDate(openingDate.getUTCDate() - 1);
+  const dates = [
+    ...new Set([
+      openingDate.toISOString().slice(0, 10),
+      ...sortedGameDates,
+      today
+    ])
+  ].sort();
+
+  const series = poolieNames.map((poolie) => {
+    const dailyPoints = new Map();
+    const roster = players.filter((player) => player.poolie === poolie);
+    for (const player of roster) {
+      const games = gameLogsByPlayerId[player.playerId] ?? [];
+      for (const game of games) {
+        dailyPoints.set(
+          game.gameDate,
+          (dailyPoints.get(game.gameDate) ?? 0) + Number(game.points ?? 0)
+        );
+      }
+    }
+
+    let runningTotal = 0;
+    return {
+      name: poolie,
+      points: dates.map((date) => {
+        runningTotal += dailyPoints.get(date) ?? 0;
+        return { date, value: runningTotal };
+      })
+    };
+  });
+
+  return {
+    schemaVersion: 1,
+    seasonId,
+    generatedAt: generatedAt.toISOString(),
+    dates,
+    series
+  };
+}
